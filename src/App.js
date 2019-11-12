@@ -3,7 +3,10 @@
 import React, { Component } from "react";
 import GraphiQL from "graphiql";
 import GraphiQLExplorer from "graphiql-explorer";
-import { buildClientSchema, getIntrospectionQuery, parse } from "graphql";
+import { 
+  buildClientSchema,
+  // getIntrospectionQuery,
+  parse } from "graphql";
 
 import { makeDefaultArg, getDefaultScalarArgValue } from "./CustomArgs";
 
@@ -14,13 +17,14 @@ import type { GraphQLSchema } from "graphql";
 
 function fetcher(params: Object): Object {
   return fetch(
-    "https://serve.onegraph.com/dynamic?app_id=c333eb5b-04b2-4709-9246-31e18db397e1",
+    "http://localhost:4000/graphql",
+    // "https://serve.onegraph.com/dynamic?app_id=c333eb5b-04b2-4709-9246-31e18db397e1",
     {
       method: "POST",
-      headers: {
+      headers: new Headers({
         Accept: "application/json",
-        "Content-Type": "application/json"
-      },
+        'Content-type': 'application/json',
+      }),
       body: JSON.stringify(params)
     }
   )
@@ -89,14 +93,15 @@ class App extends Component<{}, State> {
 
   componentDidMount() {
     fetcher({
-      query: getIntrospectionQuery()
+      // query: getIntrospectionQuery()
+      query: `{ hello }`
     }).then(result => {
       const editor = this._graphiql.getQueryEditor();
       editor.setOption("extraKeys", {
         ...(editor.options.extraKeys || {}),
         "Shift-Alt-LeftClick": this._handleInspectOperation
       });
-
+      console.log(result);
       this.setState({ schema: buildClientSchema(result.data) });
     });
   }
